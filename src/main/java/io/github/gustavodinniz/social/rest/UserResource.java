@@ -1,7 +1,11 @@
 package io.github.gustavodinniz.social.rest;
 
+import io.github.gustavodinniz.social.domain.model.User;
 import io.github.gustavodinniz.social.rest.dto.CreateUserRequest;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
+import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -12,12 +16,18 @@ import javax.ws.rs.core.Response;
 public class UserResource {
 
     @POST
+    @Transactional
     public Response createUser(CreateUserRequest userRequest) {
-        return Response.ok(userRequest).build();
+        User user = new User();
+        user.setAge(userRequest.getAge());
+        user.setName(userRequest.getName());
+        user.persist();
+        return Response.ok(user).build();
     }
 
     @GET
-    public Response listAllUsers(){
-        return Response.ok().build();
+    public Response listAllUsers() {
+        PanacheQuery<User> query = User.findAll();
+        return Response.ok(query.list()).build();
     }
 }
