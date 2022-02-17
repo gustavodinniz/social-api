@@ -1,0 +1,1 @@
+sudo docker run --name social-db -p 5437:5432 -e POSTGRES_DB=social-db -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=123456 postgres:11
