@@ -10,3 +10,9 @@ CREATE TABLE tb_posts (
 	dateTime timestamp,
 	user_id bigint not null references tb_user(id)
 )
+
+create table tb_followers (
+	id bigserial not null primary key,
+	user_id bigint not null references tb_user(id),
+	follower_id bigint not null references tb_user(id)
+)
