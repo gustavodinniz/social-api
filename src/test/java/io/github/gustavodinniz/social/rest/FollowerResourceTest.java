@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.ws.rs.core.Response;
 
 import static io.restassured.RestAssured.given;
 
@@ -28,6 +29,7 @@ class FollowerResourceTest {
     FollowerRepository followerRepository;
 
     Long userId;
+    Long followerId;
 
     @BeforeEach
     @Transactional
@@ -37,6 +39,12 @@ class FollowerResourceTest {
         user.setName("Gustavo Diniz");
         userRepository.persist(user);
         userId = user.getId();
+
+        var follower = new User();
+        follower.setAge(31);
+        follower.setName("Gustavo Gomes");
+        userRepository.persist(follower);
+        followerId = follower.getId();
     }
 
     @Test
@@ -74,5 +82,22 @@ class FollowerResourceTest {
                 .put()
                 .then()
                 .statusCode(404);
+    }
+
+    @Test
+    @DisplayName("should follow a user")
+    public void followUserTest() {
+
+        var followerRequest = new FollowerRequest();
+        followerRequest.setFollowerId(followerId);
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(followerRequest)
+                .pathParam("userId", userId)
+                .when()
+                .put()
+                .then()
+                .statusCode(Response.Status.NO_CONTENT.getStatusCode());
     }
 }
