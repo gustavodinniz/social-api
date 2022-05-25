@@ -9,7 +9,9 @@ import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -134,7 +136,37 @@ class FollowerResourceTest {
                 .response();
 
         var followersCount = response.jsonPath().get("followersCount");
+        var followersContent = response.jsonPath().getList("content");
         assertEquals(Response.Status.OK.getStatusCode(), response.statusCode());
         assertEquals(1, followersCount);
+        assertEquals(1, followersContent.size());
+    }
+
+    @Test
+    @DisplayName("should return 404 on unfollow user and userId doesn't exist")
+    public void userNotFoundWhenUnfollowingAUser() {
+        var inexistentUserId = 999;
+
+        given()
+                .contentType(ContentType.JSON)
+                .pathParam("userId", inexistentUserId)
+                .queryParam("followerId", followerId)
+                .when()
+                .delete()
+                .then()
+                .statusCode(Response.Status.NOT_FOUND.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("should unfollow an User")
+    public void unfollowUserTest() {
+
+        given()
+                .pathParam("userId", userId)
+                .queryParam("followerId", followerId)
+                .when()
+                .delete()
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode());
     }
 }
